@@ -1,0 +1,17 @@
+﻿---
+AccessModifierOffset: "-4"
+AlignConsecutiveAssignments: "true"
+AlignConsecutiveDeclarations: "true"
+BreakBeforeBraces: Attach
+BreakBeforeInheritanceComma: "true"
+BreakConstructorInitializers: BeforeComma
+ColumnLimit: "0"
+IndentWidth: "4"
+PointerAlignment: Left
+SpaceAfterCStyleCast: "false"
+SpaceAfterTemplateKeyword: "false"
+TabWidth: "4"
+AlignArrayOfStructures: "Right"
+ContinuationIndentWidth: "4"
+BracedInitializerIndentWidth: "4"
+SortIncludes: "false"
