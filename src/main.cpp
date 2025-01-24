@@ -3,7 +3,7 @@
 
 void receive() {
     NDI_MIDI_Manager ndi_midi_manager;
-    MIDI_IO_MANAGER midi_io_manager(L"NDI MIDI");
+    MIDI_IO_MANAGER  midi_io_manager(L"NDI MIDI");
 
     ndi_midi_manager.UpdateSources();
 
@@ -30,7 +30,6 @@ void receive() {
 
     ndi_midi_manager.ConnectToSource(&sources[source_index]);
 
-
     std::println("Starting reception, press enter to exit...");
 
     bool end = false;
@@ -40,18 +39,22 @@ void receive() {
             end = true;
         }
         auto data_string = ndi_midi_manager.ReceiveMIDI(100);
-        if (data_string.has_value()) {
-            auto data = ndi_midi_manager.ParseMIDIMessage(data_string.value());
 
-            if (data.size() > 0) {
-                midi_io_manager.SendMIDI(data);
-            }
+        if (!data_string.has_value()) {
+            continue;
         }
+
+        if (data_string.value().empty()) {
+            continue;
+        }
+        auto data = ndi_midi_manager.ParseMIDIMessage(data_string.value());
+
+        if (data.empty()) {
+            continue;
+        }
+
+        midi_io_manager.SendMIDI(data);
     }
-
-
-
-    
 }
 
 void transmit() {
@@ -78,14 +81,12 @@ void transmit() {
     }
     std::println("Opening MIDI Port {}", port_index);
 
-
     bool succ = midi_io_manager.OpenMIDIPort((uint32_t)port_index);
 
     if (!succ) {
         std::println("Error opening MIDI port. Exiting...");
         return;
     }
-
 
     NDI_MIDI_Manager ndi_midi_manager;
 

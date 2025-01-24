@@ -59,22 +59,22 @@ void NDI_MIDI_Manager::UpdateSources() {
         return;
     }
 
-    if (!NDIlib_find_wait_for_sources(m_p_find, 5000)) {
-        std::println("timeout waiting for sources");
-    } else {
+    while (NDIlib_find_wait_for_sources(m_p_find, 1000)) {
 
-        const auto p_sources = NDIlib_find_get_current_sources(m_p_find, &m_n_sources);
+        std::println("found source...");
+    }
 
-        m_p_sources.clear();
-        m_p_sources.reserve(m_n_sources);
+    const auto p_sources = NDIlib_find_get_current_sources(m_p_find, &m_n_sources);
 
-        if (p_sources) {
-            std::println("found {} sources", m_n_sources);
+    m_p_sources.clear();
+    m_p_sources.reserve(m_n_sources);
 
-            for (uint32_t i = 0; i < m_n_sources; i++) {
-                std::println("source {}: {}", i, p_sources[i].p_ndi_name);
-                m_p_sources.push_back(p_sources[i]);
-            }
+    if (p_sources) {
+        std::println("found {} sources", m_n_sources);
+
+        for (uint32_t i = 0; i < m_n_sources; i++) {
+            std::println("source {}: {}", i, p_sources[i].p_ndi_name);
+            m_p_sources.push_back(p_sources[i]);
         }
     }
 }
@@ -150,11 +150,11 @@ std::vector<uint8_t> NDI_MIDI_Manager::ParseMIDIMessage(const std::string_view& 
         return data;
     }
 
-    if (message.substr(0, 6).compare("<MIDI>") != 0 || message.substr(message.size() - 7, 7).compare("</MIDI>") != 0) {
+    if (message.substr(0, 6).compare("<MIDI>") != 0 || message.substr(message.size() - 8, 7).compare("</MIDI>") != 0) {
         return data;
     }
 
-    auto midi_hex_message = message.substr(6, message.size() - 13);
+    auto midi_hex_message = message.substr(6, message.size() - 14);
 
     for (size_t i = 0; i < midi_hex_message.size(); i += 2) {
         data.push_back(
@@ -227,10 +227,9 @@ MIDI_IO_MANAGER::MIDI_IO_MANAGER(const std::wstring_view& port_name) {
 
     try {
         m_p_midi_in = std::make_unique<RtMidiIn>(
-            RtMidi::Api::UNSPECIFIED, 
-            "RtMidi Input Client", 
-            1000
-        );
+            RtMidi::Api::UNSPECIFIED,
+            "RtMidi Input Client",
+            1000);
     } catch (RtMidiError& error) {
         std::println("error creating RtMidiIn: {}", error.getMessage());
         exit(EXIT_FAILURE);
