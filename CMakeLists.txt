@@ -1,10 +1,17 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.3)
 
 project(midi_to_ndi LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
+
+set(Boost_USE_STATIC_LIBS        ON)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+
+
+find_package(Boost REQUIRED COMPONENTS program_options REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
@@ -22,14 +29,20 @@ set(VIRTUAL_MIDI_SRC "$ENV{LIB_SDK}/teVirtualMIDISDK/C-Binding")
 set(NDI_SDK "C:/Program Files/NDI/NDI 6.1.1.0 SDK")
 
 include_directories(
-  "${VIRTUAL_MIDI_SRC}"
-  "${NDI_SDK}/Include"
+  ${VIRTUAL_MIDI_SRC}
+  ${NDI_SDK}/Include
+  ${Boost_INCLUDE_DIRS}
+)
+
+LINK_DIRECTORIES(
+  ${Boost_LIBRARY_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   "${VIRTUAL_MIDI_SRC}/teVirtualMIDI64.lib"
   "${NDI_SDK}/Lib/x64/Processing.NDI.Lib.x64.lib"
   winmm.lib
+  ${Boost_LIBRARIES}
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE UNICODE _UNICODE)

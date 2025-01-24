@@ -1,6 +1,6 @@
 #include "ndimidi.hpp"
 
-NDI_MIDI_Manager::NDI_MIDI_Manager() {
+NDI_MIDI_Manager::NDI_MIDI_Manager(const std::string_view& send_name) {
 
     NDIlib_initialize();
 
@@ -15,7 +15,7 @@ NDI_MIDI_Manager::NDI_MIDI_Manager() {
     }
 
     auto send_create_desc = NDIlib_send_create_t(
-        "NDI MIDI",
+        send_name.data(),
         nullptr,
         false,
         false);
@@ -59,9 +59,9 @@ void NDI_MIDI_Manager::UpdateSources() {
         return;
     }
 
+    // wait as long as we are still finding new sources
+    // NDIlib_find_wait_for_sources returns immideately after a NEW source is found, so if we only call it once, we will only have the first source
     while (NDIlib_find_wait_for_sources(m_p_find, 1000)) {
-
-        std::println("found source...");
     }
 
     const auto p_sources = NDIlib_find_get_current_sources(m_p_find, &m_n_sources);
@@ -73,7 +73,6 @@ void NDI_MIDI_Manager::UpdateSources() {
         std::println("found {} sources", m_n_sources);
 
         for (uint32_t i = 0; i < m_n_sources; i++) {
-            std::println("source {}: {}", i, p_sources[i].p_ndi_name);
             m_p_sources.push_back(p_sources[i]);
         }
     }
@@ -166,6 +165,9 @@ std::vector<uint8_t> NDI_MIDI_Manager::ParseMIDIMessage(const std::string_view& 
 
     return data;
 }
+
+MIDI_IO_MANAGER::MIDI_IO_MANAGER(const std::string_view& port_name)
+    : MIDI_IO_MANAGER(std::wstring(port_name.begin(), port_name.end())) {}
 
 MIDI_IO_MANAGER::MIDI_IO_MANAGER(const std::wstring_view& port_name) {
 

@@ -2,7 +2,7 @@
 
 class NDI_MIDI_Manager {
 public:
-    NDI_MIDI_Manager();
+    NDI_MIDI_Manager(const std::string_view& send_name = "NDI MIDI");
     ~NDI_MIDI_Manager();
 
     // delete copy constructor and assignment operator
@@ -48,6 +48,7 @@ private:
 class MIDI_IO_MANAGER {
 
 public:
+    MIDI_IO_MANAGER(const std::string_view& port_name);
     MIDI_IO_MANAGER(const std::wstring_view& port_name);
     ~MIDI_IO_MANAGER();
 

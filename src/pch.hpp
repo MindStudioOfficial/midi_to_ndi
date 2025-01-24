@@ -24,5 +24,10 @@
 #include <thread>
 #include <unordered_map>
 #include <chrono>
+#include <iostream>
+#include <sstream>
+#include <csignal>
+
+#include <boost/program_options.hpp>
 
 #include <conio.h>
